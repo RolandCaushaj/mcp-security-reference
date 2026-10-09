@@ -1,132 +1,128 @@
-# 🔐 MCP Security Reference
+# MCP Security Reference
 
-**Comprehensive security considerations, chain validation patterns, and auditing methodology for Model Context Protocol (MCP) multi-server agent architectures.**
+Security considerations, chain validation patterns, and auditing 
+methodology for Model Context Protocol (MCP) multi-server architectures.
 
----
-
-## Overview
-
-This reference guide addresses critical security concerns when implementing Model Context Protocol (MCP) systems with multiple servers and AI agents. As MCP becomes central to AI agent orchestration, security must be a first-class citizen in architecture design.
-
-### Why This Matters
-- **Multi-server complexity**: Each additional server increases attack surface
-- **Chain of trust**: Validation patterns cascade through agent architectures
-- **Audit trails**: Essential for compliance and incident response in production AI systems
+> **Maintained by [Roland Caushaj](https://github.com/RolandCaushaj)**, 
+> security researcher at [Logic4Hack](https://logic4hack.com) — 
+> adversarial testing of LLM, RAG and agent systems.
+>
+> The patterns documented here are used in our internal MCP audit 
+> toolchain. Client engagements, anonymized by sector and perimeter, 
+> are shared under NDA on request.
 
 ---
 
-## 🎯 Key Topics
+## Why this exists
 
-### Security Foundations
-- **Server authentication & authorization** — Identity verification and permission models
-- **Protocol-level security** — Message signing, encryption, and integrity checks
-- **Chain validation patterns** — Ensuring trust through multi-hop communications
+MCP is becoming the integration layer for AI agents. Each MCP server 
+adds attack surface. Multi-server chains propagate trust transitively — 
+one compromised node reaches every tool downstream of it.
 
-### Auditing & Monitoring
-- **Event logging strategies** — What to capture for compliance and debugging
-- **Anomaly detection** — Identifying suspicious agent behavior
-- **Audit log integrity** — Protecting logs from tampering
+A clean web pentest does not reach this surface. The chain your agent 
+trusts is not the chain your firewall sees.
 
-### Threat Models
-- **Man-in-the-middle attacks** — Preventing interception in multi-server setups
-- **Privilege escalation** — Containing damage from compromised servers
-- **Supply chain risks** — Vetting and monitoring third-party MCP servers
-
-### Implementation Patterns
-- **Zero-trust architecture** — Never trust, always verify
-- **Defense in depth** — Multiple security layers
-- **Secure defaults** — Making the right choice the easy choice
+This reference documents the security concerns, validation patterns, 
+and auditing methodology we apply to MCP multi-server architectures.
 
 ---
 
-## 🚀 Quick Start
+## Scope
 
-```bash
-# Clone this reference
-git clone https://github.com/RolandCaushaj/mcp-security-reference.git
-cd mcp-security-reference
+This repository covers:
 
-# Explore the documentation
-ls docs/
-```
+- **Chain validation** — verifying trust across multi-hop MCP calls
+- **Authentication** — identity, permissions, origin verification
+- **Auditing** — logging, anomaly detection, tamper protection
+- **Threat models** — MITM, privilege escalation, supply chain
+- **Framework classification** — findings mapped to public controls
 
----
-
-## 📚 Contents
-
-```
-├── docs/                          # Core security documentation
-│   ├── authentication.md           # Auth & authorization patterns
-│   ├── chain-validation.md         # Multi-hop trust validation
-│   ├── auditing.md                 # Logging & audit strategies
-│   ├── threat-models.md            # Common attack scenarios
-│   └── best-practices.md           # Production security checklist
-├── examples/                       # Code examples & implementations
-│   ├── server-auth/                # Secure server setup
-│   ├── message-signing/            # Digital signature patterns
-│   └── audit-logging/              # Logging implementations
-└── README.md                       # This file
-```
+This repository does **not** include the toolchain itself, the case 
+library, or client engagements. Those are proprietary and used under 
+NDA.
 
 ---
 
-## 🛡️ Best Practices at a Glance
+## Framework classifications
 
-- ✅ **Authenticate every connection** — No exceptions
-- ✅ **Validate all messages** — Including those from trusted servers
-- ✅ **Log comprehensively** — Especially in security-critical paths
-- ✅ **Monitor for anomalies** — Detect unusual agent behavior
-- ✅ **Test failure modes** — Security under adversarial conditions
-- ✅ **Keep secrets secret** — Secure key storage and rotation
-- ✅ **Document security assumptions** — Make implicit constraints explicit
+Findings produced with the methodology documented here are classified 
+against:
 
----
+- **OWASP MCP Top 10 (Beta)** — MCP01 through MCP12
+- **OWASP Top 10 for LLM Applications** — LLM01 through LLM10
+- **MITRE ATLAS** — AML.T0051, AML.T0053
+- **NIST AI RMF** — MEASURE function
+- **ISO/IEC 42001** — AI management system controls
 
-## 🤝 Contributing
-
-This is an active reference guide. Contributions are welcome:
-
-1. **Found a security gap?** Open an issue with details
-2. **Have a pattern to share?** Submit a pull request with examples
-3. **Spotted a mistake?** Help us keep this accurate
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Classification is done by controls mapping, not certification. 
+Certification is issued by an accredited body.
 
 ---
 
-## ⚠️ Security Considerations
+## Reference findings
 
-If you discover a security vulnerability in MCP or in this documentation:
-- **Do not open a public issue**
-- Email security concerns directly to maintainers
-- Include reproduction steps and potential impact
+The following findings are from our own lab. Each is reproducible, 
+classified, and closed by a harness that asserts the property it 
+protects. Client findings are shared under NDA in the same format.
 
-This project is a reference—always perform your own security audit before production deployment.
+| ID | Severity | Weakness | Classification |
+|---|---|---|---|
+| LH-LAB-2026-001 | HIGH | MCP chain depth above safe threshold | OWASP MCP04 · MITRE AML.T0051 · NIST AI RMF · ISO/IEC 42001 |
+| LH-LAB-2026-002 | CRITICAL | Server admitted without pinned identity | OWASP MCP03 · MCP01 (Beta) |
+| LH-LAB-2026-003 | MEDIUM | Cross-model divergence | OWASP LLM01 · MITRE AML.T0051 |
 
----
-
-## 📖 Resources
-
-- **[Model Context Protocol (MCP) Specification](https://spec.modelcontextprotocol.io/)**
-- **[OWASP Top 10](https://owasp.org/www-project-top-ten/)** — Common web security risks
-- **[Security by Design](https://cheatsheetseries.owasp.org/)** — OWASP Cheat Sheets
+The full finding register, including reproduction steps, severity 
+rationale, and closure harnesses, is available on request under NDA.
 
 ---
 
-## 📄 License
+## Methodology
 
-This reference is provided as-is for educational and production use. Check the LICENSE file for full details.
+Every test case is defined as one attack objective with:
+
+- **Defined preconditions** — what must be true before the test runs
+- **A pass/fail criterion** — validated against a known-bad response 
+  and a known-good response
+- **A reproducible proof of concept** — runnable command, exit 0 or 1
+- **A public classification** — mapped to a framework control
+
+A criterion is accepted only if it flags a violating response, clears 
+a refusing response, and still flags a refusal followed by compliance.
 
 ---
 
-## 👤 Author
+## Data sovereignty
 
-**Roland Caushaj**  
-GitHub: [@RolandCaushaj](https://github.com/RolandCaushaj)
+Testing runs on hardware we own, in an isolated environment dedicated 
+to a single engagement at a time. No client data reaches a third-party 
+model API. No subprocessors are declared in the DPA.
 
-💡 **Have questions?** Open a discussion or issue—security questions deserve thorough answers.
+- On-premises execution on owned DGX infrastructure
+- Cross-model testing on locally hosted models
+- Artefacts retained for 30 days, then destroyed
+- Immediate destruction on written request
+
+---
+
+## About
+
+[Logic4Hack](https://logic4hack.com) is an AI security firm 
+specializing in adversarial testing of LLM, RAG, agent, and MCP 
+systems. Two named researchers deliver every engagement. No 
+subcontracting, no pyramid.
+
+[Get in touch](https://logic4hack.com/contact) if you're shipping 
+an AI system and need to prove its security to a customer, an 
+auditor, or an insurer.
+
+---
+
+## License
+
+Content in this repository is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). 
+Code examples, if any, are licensed under MIT.
 
 ---
 
 **Last updated**: October 2026  
-**Status**: Active maintenance
+**Status**: Active — content updated as MCP security research evolves
