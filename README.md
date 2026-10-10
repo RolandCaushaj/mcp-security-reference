@@ -69,7 +69,7 @@ protects. Client findings are shared under NDA in the same format.
 |---|---|---|---|
 | LH-LAB-2026-001 | HIGH | MCP chain depth above safe threshold | OWASP MCP04 · MITRE AML.T0051 · NIST AI RMF · ISO/IEC 42001 |
 | LH-LAB-2026-002 | CRITICAL | Server admitted without pinned identity | OWASP MCP03 · MCP01 (Beta) |
-| LH-LAB-2026-003 | MEDIUM | Cross-model divergence | OWASP LLM01 · MITRE AML.T0051 |
+
 
 The full finding register, including reproduction steps, severity 
 rationale, and closure harnesses, is available on request under NDA.
